@@ -5,7 +5,7 @@
   
   <button @click="refineSearch = true" v-if="!refineSearch">Refine Search</button>
   
-  <form id="app" @submit.prevent="loadVenues" v-if="refineSearch">
+  <form id="app" @submit.prevent="loadVenues(location)" v-if="refineSearch">
     <div class="flex">
       <p class="flex-child">
         <label for="location">Location</label>
