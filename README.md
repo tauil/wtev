@@ -1,4 +1,12 @@
-# wtev
+# wtev - Wat te eten vandaag?
+
+Just a simple Vue App using Foursquare API to bring nearby venues with some filters.
+
+## TODO
+
+- [ ] Write tests
+- [ ] Better layout?
+- [ ] Show more informations like pricing, reviews and rating
 
 ## Project setup
 ```
