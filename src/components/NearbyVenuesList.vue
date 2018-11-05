@@ -1,29 +1,32 @@
 <template>
 <section id="nearby-venues-list">
-  <h1>Looking for venues related to {{section}} nearby: {{location}} ({{radius}} meters far)</h1>
-
+  <h2>Venues related to {{section}} nearby: {{location}}</h2>
+  <p>({{radius}} meters far)</p>
+  
   <button @click="refineSearch = true" v-if="!refineSearch">Refine Search</button>
   
   <form id="app" @submit.prevent="loadVenues" v-if="refineSearch">
-    <p>
-      <label for="location">Location</label>
-      <input id="location" v-model="location" type="text" name="location" autocomplete="off">
-    </p>
+    <div class="flex">
+      <p class="flex-child">
+        <label for="location">Location</label>
+        <input id="location" v-model="location" type="text" name="location" autocomplete="off">
+      </p>
+      
+      <p class="flex-child">
+        <label for="section">Venue Type (Pizzeria, Burger)</label>
+        <input id="section" v-model="section" type="text" name="section" autocomplete="off">
+      </p>
+      
+      <p class="flex-child">
+        <label for="radius">Radius of distance from you</label>
+        <input id="radius" v-model="radius" type="number" name="radius" autocomplete="off">
+      </p>
+    </div>
     
-    <p>
-      <label for="section">Venue category (Pizza, Barber, etc)</label>
-      <input id="section" v-model="section" type="text" name="section" autocomplete="off">
-    </p>
-    
-    <p>
-      <label for="radius">Radius of distance from you</label>
-      <input id="radius" v-model="radius" type="number" name="radius" autocomplete="off">
-    </p>
-    
-    <p>
+    <div id="form-actions">
       <button @click="refineSearch = false">Cancel</button>
       <input type="submit" value="Search">
-    </p>
+    </div>
   </form>
   
   <ul v-if="!loading">
@@ -99,7 +102,4 @@ export default {
 </script>
 
 <style scoped>
-li {
-  margin: 0 0 1em;
-}
 </style>

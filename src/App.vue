@@ -1,7 +1,8 @@
 <template>
-  <div id="app">
-    <NearbyVenuesList />
-  </div>
+<div id="app">
+  <h1>Wat te eten vandaag?</h1>
+  <NearbyVenuesList />
+</div>
 </template>
 
 <script>
