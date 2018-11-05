@@ -1,13 +1,41 @@
 <template>
 <section id="nearby-venues-list">
-  <h1>Near by venues:</h1>
-  <ul>
+  <h1>Looking for venues related to {{section}} nearby: {{location}} ({{radius}} meters far)</h1>
+
+  <button @click="refineSearch = true" v-if="!refineSearch">Refine Search</button>
+  
+  <form id="app" @submit.prevent="loadVenues" v-if="refineSearch">
+    <p>
+      <label for="location">Location</label>
+      <input id="location" v-model="location" type="text" name="location" autocomplete="off">
+    </p>
+    
+    <p>
+      <label for="section">Venue category (Pizza, Barber, etc)</label>
+      <input id="section" v-model="section" type="text" name="section" autocomplete="off">
+    </p>
+    
+    <p>
+      <label for="radius">Radius of distance from you</label>
+      <input id="radius" v-model="radius" type="number" name="radius" autocomplete="off">
+    </p>
+    
+    <p>
+      <button @click="refineSearch = false">Cancel</button>
+      <input type="submit" value="Search">
+    </p>
+  </form>
+  
+  <ul v-if="!loading">
     <li v-for="venue in venues" :key="venue.id">
-      {{venue.name}}<br />
+      <a v-bind:href="venueMap(venue.location.address)" target="_new">{{venue.name}}</a><br />
       {{venue.location.address}} {{venue.location.postalCode}}<br />
       {{venue.categories.map(c => c.name).join(', ')}}
     </li>
+    <li v-if="venues.length === 0">No venues found with this criteria.</li>
   </ul>
+
+  <p v-if="loading">Loading...</p>
 </section>
 </template>
 
@@ -19,6 +47,11 @@ export default {
   data: () => {
     return {
       loading: false,
+      refineSearch: false,
+      // Default location case user doesn't allow browser to get the location.
+      location: 'Amsterdam, NH, Netherlands',
+      radius: 250,
+      section: 'pizza',
       venues: []
     }
   },
@@ -26,12 +59,47 @@ export default {
     this.loadVenues();
   },
   methods: {
-    loadVenues: function () {
-      client.getVenues().subscribe(venues => this.venues = venues);
+    venueMap: function (address) {
+      return 'https://www.google.com/maps/search/?api=1&query=' + address;
+    },
+    loadVenues: function (location) {
+      this.loading = true;
+      let component = this;
+
+      const observerResolver = {
+        next: (venues) => {
+          component.venues = venues;
+          component.loading = false;
+        },
+        error: (error) => {
+          console.log(error);
+        }
+      }
+
+      // If location explicitly set, use it and return
+      if (location) {
+        client.getVenues(component.location, component.radius, component.section).subscribe(observerResolver);
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          component.location = position.coords.latitude + ',' + position.coords.longitude;
+          client.getVenues(component.location, component.radius, component.section).subscribe(observerResolver);
+        },
+        function() {
+          // Loading vanues using default location
+          client.getVenues(component.location, component.radius, component.section).subscribe(observerResolver);
+        }
+      );
+      
     }
   }
 }
 </script>
 
-<style>
+<style scoped>
+li {
+  margin: 0 0 1em;
+}
 </style>
